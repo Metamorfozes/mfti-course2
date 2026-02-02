@@ -39,6 +39,18 @@ A Sparse Autoencoder (SAE) is trained on the CLIP image embeddings with the foll
 - Epochs: 5
 - Sparsity regularization: L1 penalty
 
+### SAE Training Metrics
+
+| L1 coefficient (λ) | Dictionary size | Avg. L0 (active latents) | Reconstruction MSE | R2 score (Explained Variance) |
+| ------------------ | --------------- | ------------------------- | ------------------ | ----------------------------- |
+| 1e-3               | 4096            | ≈ 2050                    | ≈ 6e-6             | ≈ 0.995                       |
+| 1e-2               | 4096            | ≈ 900                     | ≈ 1.5e-5           | ≈ 0.988                       |
+| 3e-2               | 4096            | ≈ 570                     | ≈ 3.0e-5           | ≈ 0.977                       |
+
+As λ increases, the average number of active latents drops, indicating stronger sparsity.
+This sparsity comes with a gradual increase in reconstruction error and a small decrease in explained variance.
+Overall, the metrics show a clear sparsity–reconstruction trade-off while preserving most of the variance.
+
 We evaluate three sparsity levels:
 1) λ = 1e-3
 2) λ = 1e-2
@@ -48,6 +60,11 @@ Increasing the L1 coefficient leads to stronger sparsity (lower average number o
 
 ## Zero-Shot Classification Evaluation
 We evaluate the effect of SAE reconstruction on zero-shot classification accuracy using CIFAR-10 and CIFAR-100.
+
+We evaluate zero-shot performance on CIFAR-10 and CIFAR-100 to cover datasets of different difficulty.
+CIFAR-10 contains a small number of coarse-grained object categories, making it an easier benchmark.
+CIFAR-100 is significantly more challenging due to fine-grained classes and higher inter-class similarity.
+Together, these datasets allow us to assess how SAE reconstruction affects CLIP performance across varying levels of semantic complexity.
 
 Results for λ = 3e-2 (best interpretability):
 | Dataset   | CLIP Baseline | CLIP + SAE |
