@@ -92,6 +92,27 @@ Latent 8: Events and performances
 
 These visualizations show that individual SAE neurons correspond to semantic features rather than low-level visual patterns.
 
+### Auto-interpretation of SAE latents (300 latents)
+
+We automatically interpreted 300 SAE latents using a local BLIP image captioning model, without any external API calls.
+For each latent, the top-activating images were captioned and summarized into a single-sentence description.
+Results are saved to artifacts/interpret/latents_0_300_blip.csv.
+
+| Type         | Latent ID | Collage                                      | Auto-interpretation                                                               |
+| ------------ | --------- | -------------------------------------------- | --------------------------------------------------------------------------------- |
+| no_clear     | 189       | ![](assets/report_latents/latent_189.png)    | This feature activates on images containing: man, group, people, sitting, tables. |
+| no_clear     | 247       | ![](assets/report_latents/latent_247.png)    | This feature activates on images containing: street, man, group, people, walking. |
+| no_clear     | 178       | ![](assets/report_latents/latent_178.png)    | This feature activates on images containing: woman, holding, man, walking, through. |
+| too_specific | 44        | ![](assets/report_latents/latent_44.png)     | This feature activates on images containing: small, restaurant, large, neon, sign. |
+| too_specific | 132       | ![](assets/report_latents/latent_132.png)    | This feature activates on images containing: blue, cloudy, sky, painting, white. |
+| too_specific | 264       | ![](assets/report_latents/latent_264.png)    | This feature activates on images containing: yellow, fence, grass, green, red. |
+| semantic     | 296       | ![](assets/report_latents/latent_296.png)    | This feature activates on images containing: woman, playing, tennis, man, wearing. |
+| semantic     | 61        | ![](assets/report_latents/latent_61.png)     | This feature activates on images containing: walking, down, street, man, bride. |
+| semantic     | 117       | ![](assets/report_latents/latent_117.png)    | This feature activates on images containing: down, group, people, playing, game. |
+| favorite     | 109       | ![](assets/report_latents/latent_109.png)    | This feature activates on images containing: woman, standing, front, wall, picture. |
+| favorite     | 78        | ![](assets/report_latents/latent_78.png)     | This feature activates on images containing: person, kayak, pada, sunset, boat. |
+| favorite     | 278       | ![](assets/report_latents/latent_278.png)    | This feature activates on images containing: boat, parked, front, house, man. |
+
 ## Discussion
 The results demonstrate a clear trade-off:
 - Higher sparsity → stronger interpretability
