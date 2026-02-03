@@ -29,6 +29,7 @@ reproducible setting, and later apply the same principles to study interpretabil
 # Dataset and Embeddings
 We use Flickr30k images and extract image embeddings with OpenCLIP ViT-B/32 (laion2b_s34b_b79k).
 Each image is represented by a 512-dimensional CLIP embedding.
+We also trained a separate SAE on Kandinsky 2.2 prior embeddings (1280-d) for steering experiments.
 
 # Sparse Autoencoder Training
 A Sparse Autoencoder (SAE) is trained on the CLIP image embeddings with the following setup:
@@ -41,11 +42,11 @@ A Sparse Autoencoder (SAE) is trained on the CLIP image embeddings with the foll
 
 ### SAE Training Metrics
 
-| L1 coefficient (λ) | Dictionary size | Avg. L0 (active latents) | Reconstruction MSE | R2 score (Explained Variance) |
-| ------------------ | --------------- | ------------------------- | ------------------ | ----------------------------- |
-| 1e-3               | 4096            | ≈ 2050                    | ≈ 6e-6             | ≈ 0.995                       |
-| 1e-2               | 4096            | ≈ 900                     | ≈ 1.5e-5           | ≈ 0.988                       |
-| 3e-2               | 4096            | ≈ 570                     | ≈ 3.0e-5           | ≈ 0.977                       |
+| L1 coefficient (lambda) | Dictionary size | Avg. L0 | Reconstruction MSE | L1 | R2 |
+| --- | --- | --- | --- | --- | --- |
+| 1e-2 | 4096 | 865.54 | 1.54818e-05 | 0.00437796 | 0.98799 |
+| 1e-3 | 4096 | 1998.50 | 5.80056e-06 | 0.0127376 | 0.9955 |
+| 3e-2 | 4096 | 571.50 | 2.9658e-05 | 0.00242459 | 0.976992 |
 
 As λ increases, the average number of active latents drops, indicating stronger sparsity.
 This sparsity comes with a gradual increase in reconstruction error and a small decrease in explained variance.
@@ -66,11 +67,15 @@ CIFAR-10 contains a small number of coarse-grained object categories, making it 
 CIFAR-100 is significantly more challenging due to fine-grained classes and higher inter-class similarity.
 Together, these datasets allow us to assess how SAE reconstruction affects CLIP performance across varying levels of semantic complexity.
 
-Results for λ = 3e-2 (best interpretability):
-| Dataset   | CLIP Baseline | CLIP + SAE |
-| --------- | ------------- | ---------- |
-| CIFAR-10  | 0.9366        | 0.9187     |
-| CIFAR-100 | 0.7569        | 0.7182     |
+Results across all three λ values:
+| Lambda | Dataset | CLIP Baseline | CLIP + SAE |
+| ------ | ------- | ------------- | ---------- |
+| 1e-3   | CIFAR-10 | 0.9366 | 0.9210 |
+| 1e-3   | CIFAR-100 | 0.7569 | 0.7355 |
+| 1e-2   | CIFAR-10 | 0.9366 | 0.9205 |
+| 1e-2   | CIFAR-100 | 0.7569 | 0.7226 |
+| 3e-2   | CIFAR-10 | 0.9366 | 0.9187 |
+| 3e-2   | CIFAR-100 | 0.7569 | 0.7182 |
 
 As expected, reconstruction through the SAE slightly reduces accuracy, but performance remains competitive while gaining interpretability.
 
@@ -112,6 +117,28 @@ Results are saved to artifacts/interpret/latents_0_300_blip.csv.
 | favorite     | 109       | ![](assets/report_latents/latent_109.png)    | This feature activates on images containing: woman, standing, front, wall, picture. |
 | favorite     | 78        | ![](assets/report_latents/latent_78.png)     | This feature activates on images containing: person, kayak, pada, sunset, boat. |
 | favorite     | 278       | ![](assets/report_latents/latent_278.png)    | This feature activates on images containing: boat, parked, front, house, man. |
+
+## Kandinsky2.2 Steering (SAE features)
+We trained an SAE on Kandinsky2.2 prior embeddings (1280-d) and steer generation by adding or subtracting a single latent direction in embedding space before decoding.
+
+Latent 61
+| orig | plus | minus |
+| ---- | ---- | ----- |
+| ![](assets/steer/latent61_orig.png) | ![](assets/steer/latent61_plus.png) | ![](assets/steer/latent61_minus.png) |
+
+Latent 117
+| orig | plus | minus |
+| ---- | ---- | ----- |
+| ![](assets/steer/latent117_orig.png) | ![](assets/steer/latent117_plus.png) | ![](assets/steer/latent117_minus.png) |
+
+Latent 296
+| orig | plus | minus |
+| ---- | ---- | ----- |
+| ![](assets/steer/latent296_orig.png) | ![](assets/steer/latent296_plus.png) | ![](assets/steer/latent296_minus.png) |
+
+For all examples, we use the same prompt and random seed, modifying only a single SAE latent direction,
+which isolates the effect of the learned feature.
+
 
 ## Discussion
 The results demonstrate a clear trade-off:
