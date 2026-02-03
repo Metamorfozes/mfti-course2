@@ -112,8 +112,18 @@ def load_topk_map(topk_path: Path) -> Dict[int, List[str]]:
                 continue
             record = json.loads(line)
             latent_id = int(record["latent_id"])
-            paths = [entry["path"] for entry in record.get("top", [])]
-            topk_map[latent_id] = paths
+            best_by_name: Dict[str, Tuple[float, str]] = {}
+            for entry in record.get("top", []):
+                path = entry.get("path", "")
+                activation = float(entry.get("activation", 0.0))
+                name = Path(path).name
+                prev = best_by_name.get(name)
+                if prev is None or activation > prev[0]:
+                    best_by_name[name] = (activation, path)
+            dedup_sorted = sorted(
+                best_by_name.values(), key=lambda x: x[0], reverse=True
+            )
+            topk_map[latent_id] = [path for _, path in dedup_sorted]
     return topk_map
 
 
